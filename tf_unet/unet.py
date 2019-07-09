@@ -2,12 +2,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # tf_unet is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with tf_unet.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -99,11 +99,11 @@ def create_conv_net(x, keep_prob, channels, n_class, layers=3, features_root=16,
             biases.append((b1, b2))
             convs.append((conv1, conv2))
 
-            size -= 4
+            size -= 2 * 2 * (filter_size // 2) # valid conv
             if layer < layers - 1:
                 pools[layer] = max_pool(dw_h_convs[layer], pool_size)
                 in_node = pools[layer]
-                size /= 2
+                size /= pool_size
 
     in_node = dw_h_convs[layers - 1]
 
@@ -134,8 +134,8 @@ def create_conv_net(x, keep_prob, channels, n_class, layers=3, features_root=16,
             biases.append((b1, b2))
             convs.append((conv1, conv2))
 
-            size *= 2
-            size -= 4
+            size *= pool_size
+            size -= 2 * 2 * (filter_size // 2) # valid conv
 
     # Output Map
     with tf.name_scope("output_map"):
@@ -179,8 +179,8 @@ class Unet(object):
     """
     A unet implementation
 
-    :param channels: (optional) number of channels in the input image
-    :param n_class: (optional) number of output labels
+    :param channels: number of channels in the input image
+    :param n_class: number of output labels
     :param cost: (optional) name of the cost function. Default is 'cross_entropy'
     :param cost_kwargs: (optional) kwargs passed to the cost function. See Unet._get_cost for more options
     """
